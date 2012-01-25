@@ -4,7 +4,7 @@ describe UsersController do
   render_views
 
 
-   describe "GET 'show'" do
+  describe "GET 'show'" do
 
     before(:each) do
       @user = Factory(:user)
@@ -20,7 +20,7 @@ describe UsersController do
       assigns(:user).should == @user
     end
 
-       it "should have the right title" do
+    it "should have the right title" do
       get :show, :id => @user
       response.should have_selector("title", :content => @user.name)
     end
@@ -37,8 +37,7 @@ describe UsersController do
   end
 
 
-
-   describe "GET 'new'" do
+  describe "GET 'new'" do
 
     it "should be successful" do
       get 'new'
@@ -51,8 +50,7 @@ describe UsersController do
     end
 
 
-
-      it "should have a name field" do
+    it "should have a name field" do
       get :new
       response.should have_selector("input[name='user[name]'][type='text']")
     end
@@ -62,63 +60,63 @@ describe UsersController do
     it "should have a password field"
 
     it "should have a password confirmation field"
-   end
-
-   end
+  end
 
 
-    describe "POST 'create'" do
 
-    describe "failure" do
 
-      before(:each) do
-        @attr = { :name => "", :email => "", :password => "",
-                  :password_confirmation => "" }
-      end
+describe "POST 'create'" do
 
-      it "should not create a user" do
-        lambda do
-          post :create, :user => @attr
-        end.should_not change(User, :count)
-      end
+  describe "failure" do
 
-      it "should have the right title" do
-        post :create, :user => @attr
-        response.should have_selector("title", :content => "Sign up")
-      end
-
-      it "should render the 'new' page" do
-        post :create, :user => @attr
-        response.should render_template('new')
-      end
+    before(:each) do
+      @attr = {:name => "", :email => "", :password => "",
+               :password_confirmation => ""}
     end
 
-    describe "success" do
-
-      before(:each) do
-        @attr = { :name => "New User", :email => "user@example.com",
-                  :password => "foobar", :password_confirmation => "foobar" }
-      end
-
-      it "should create a user" do
-        lambda do
-          post :create, :user => @attr
-        end.should change(User, :count).by(1)
-      end
-
-      it "should redirect to the user show page" do
+    it "should not create a user" do
+      lambda do
         post :create, :user => @attr
-        response.should redirect_to(user_path(assigns(:user)))
-      end
+      end.should_not change(User, :count)
+    end
 
+    it "should have the right title" do
+      post :create, :user => @attr
+      response.should have_selector("title", :content => "Sign up")
+    end
 
-      it "should have a welcome message" do
+    it "should render the 'new' page" do
+      post :create, :user => @attr
+      response.should render_template('new')
+    end
+  end
+
+  describe "success" do
+
+    before(:each) do
+      @attr = {:name => "New User", :email => "user@example.com",
+               :password => "foobar", :password_confirmation => "foobar"}
+    end
+
+    it "should create a user" do
+      lambda do
         post :create, :user => @attr
-        flash[:success].should =~ /welcome to the sample app/i
-      end
+      end.should change(User, :count).by(1)
+    end
 
+    it "should redirect to the user show page" do
+      post :create, :user => @attr
+      response.should redirect_to(user_path(assigns(:user)))
     end
 
 
- end
+    it "should have a welcome message" do
+      post :create, :user => @attr
+      flash[:success].should =~ /welcome to the sample app/i
+    end
+
+  end
+
+
+end
 end
