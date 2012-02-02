@@ -1,4 +1,8 @@
 class MicropostsController < ApplicationController
+
+  before_filter :authenticate, :only => [:create, :destroy]
+  before_filter :authorized_user, :only => :destroy
+
   # GET /microposts
   # GET /microposts.xml
   def index
@@ -40,7 +44,14 @@ class MicropostsController < ApplicationController
   # POST /microposts
   # POST /microposts.xml
   def create
-    @micropost = Micropost.new(params[:micropost])
+    @micropost = current_user.microposts.build(params[:micropost])
+    if @micropost.save
+      flash[:success] = "Micropost created!"
+      redirect_to root_path
+    else
+      @feed_item =[]
+      render 'pages/home'
+    end
 
     respond_to do |format|
       if @micropost.save
@@ -72,12 +83,14 @@ class MicropostsController < ApplicationController
   # DELETE /microposts/1
   # DELETE /microposts/1.xml
   def destroy
-    @micropost = Micropost.find(params[:id])
     @micropost.destroy
+    redirect_back_or root_path
+  end
 
-    respond_to do |format|
-      format.html { redirect_to(microposts_url) }
-      format.xml  { head :ok }
-    end
+  private
+
+  def authorized_user
+    @micropost = current_user.microposts.find_by_id(params[:id])
+    redirect_to root_path if @micropost.nil?
   end
 end
