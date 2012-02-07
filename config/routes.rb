@@ -1,5 +1,9 @@
 SampleApp::Application.routes.draw do
-
+  resources :users do
+    member do
+      get :following, :followers
+    end
+  end
 
   get "sessions/new"
 
@@ -16,6 +20,8 @@ SampleApp::Application.routes.draw do
   resources :users
 
   resources :sessions, :only => [:new, :create, :destory]
+
+  resources :relationships, :only => [:create, :destroy]
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

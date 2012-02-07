@@ -42,4 +42,12 @@ require 'spec_helper'
       @user.microposts.build(:content => "a"*141).should_not be_valid
     end
   end
+
+
+  describe "from_users_followed_by" do
+
+    before(:each) do
+
+    end
+  end
 end
