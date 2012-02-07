@@ -7,17 +7,17 @@ describe Relationship do
     @follower = Factory(:user)
     @followed = Factory(:user, :email => Factory.next(:email))
 
-    @relationship = @follower.relationships.build(:followed_id => @followed.id)
+    @attr = { :followed_id => @followed.id }
   end
 
   it "should create a new instnace given valid attributes" do
-    @relatioinship.save!
+    @follower.relationships.create!(@attr)
   end
 
  describe "follow methods" do
 
     before(:each) do
-      @relationship.save
+      @relationship = @follower.relationships.create!(@attr)
     end
 
     it "should have a follower attribute" do
@@ -40,14 +40,12 @@ describe Relationship do
 
     describe "validations" do
 
-    it "should require a follower_id" do
-      @relationship.follower_id = nil
-      @relationship.should_not be_valid
+    it "should require a follower id" do
+      Relationship.new(@attr).should_not be_valid
     end
 
-    it "should require a followed_id" do
-      @relationship.followed_id = nil
-      @relationship.should_not be_valid
+    it "should require a followed id" do
+      @follower.relationships.build.should_not be_valid
     end
   end
 end

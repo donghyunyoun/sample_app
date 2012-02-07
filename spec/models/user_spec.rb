@@ -60,6 +60,20 @@ describe User do
     user_with_duplicate_email.should_not be_valid
   end
 
+   describe "passwords" do
+
+    before(:each) do
+      @user = User.new(@attr)
+    end
+
+    it "should have a password attribute" do
+      @user.should respond_to(:password)
+    end
+
+    it "should have a password confirmation attribute" do
+      @user.should respond_to(:password_confirmation)
+    end
+  end
 
   describe "password validations" do
 
@@ -97,13 +111,21 @@ describe User do
       @user.should respond_to(:encrypted_password)
     end
 
-     it "should set the encrypted password" do
+     it "should set the encrypted password attribute" do
       @user.encrypted_password.should_not be_blank
+     end
+
+    it "should have a salt" do
+      @user.should respond_to(:salt)
     end
 
     describe "has_password? method" do
 
-      it "should be true if the passwords match" do
+      it "should exist" do
+        @user.should respond_to(:has_password?)
+      end
+
+      it "should return true if the passwords match" do
         @user.has_password?(@attr[:password]).should be_true
       end
 
@@ -115,22 +137,24 @@ describe User do
 
      describe "authenticate method" do
 
+      it "should exist" do
+        User.should respond_to(:authenticate)
+      end
+
       it "should return nil on email/password mismatch" do
-        wrong_password_user = User.authenticate(@attr[:email], "wrongpass")
-        wrong_password_user.should be_nil
+        User.authenticate(@attr[:email], "wrongpass").should be_nil
       end
 
       it "should return nil for an email address with no user" do
-        nonexistent_user = User.authenticate("bar@foo.com", @attr[:password])
-        nonexistent_user.should be_nil
+        User.authenticate("bar@foo.com", @attr[:password]).should be_nil
       end
 
       it "should return the user on email/password match" do
-        matching_user = User.authenticate(@attr[:email], @attr[:password])
-        matching_user.should == @user
+        User.authenticate(@attr[:email], @attr[:password]).should == @user
       end
      end
 
+   end
 
       describe "admin attribute" do
 
@@ -151,7 +175,6 @@ describe User do
       @user.should be_admin
     end
   end
-end
 
     describe "micropost associations" do
 
@@ -172,8 +195,11 @@ end
       it "should destroy associated microposts" do
         @user.destory
         [@mp1, @mp2].each do |micropost|
-          Micropost.find_by_id(micropost.id).should be_nil
+          lambda do
+            Micropost.find(micropost)
+          end.should raise_error(ActiveRecord::RecordNotFound)
         end
+
       end
 
        describe "status feed" do
@@ -183,8 +209,8 @@ end
       end
 
       it "should include the user's microposts" do
-        @user.feed.include?(@mp1).should be_true
-        @user.feed.include?(@mp2).should be_true
+        @user.feed.should include(@mp1)
+        @user.feed.should include(@mp2)
       end
 
       it "should not include a different user's microposts" do
@@ -219,14 +245,6 @@ end
     end
 
 
-     it "should have a following? method" do
-      @user.should respond_to(:following?)
-    end
-
-    it "should have a follow! method" do
-      @user.should respond_to(:follow!)
-    end
-
     it "should follow another user" do
       @user.follow!(@followed)
       @user.should be_following(@followed)
@@ -238,7 +256,7 @@ end
     end
 
      it "should have an unfollow! method" do
-      @followed.should respond_to(:unfollow!)
+      @user.should respond_to(:unfollow!)
     end
 
     it "should unfollow a user" do

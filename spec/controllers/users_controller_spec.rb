@@ -9,7 +9,6 @@ describe UsersController do
       it "should deny access" do
         get :index
         response.should redirect_to(signin_path)
-        flash[:notice].should =~ /sign in/i
       end
     end
     
@@ -19,11 +18,10 @@ describe UsersController do
         @user = test_sign_in(Factory(:user))
         second = Factory(:user, :name => "Bob", :email => "another@example.com")
         third = Factory(:user, :name => "Ben", :email => "another@example.net")
-        @users = [@user, second, third]
-
-         30.times do
-          @users << Factory(:user, :name => Factory.next(:name),
-                                   :email => Factory.next(:email))
+        
+        30.times do
+          Factory(:user, :name => Factory.next(:name),
+                         :email => Factory.next(:email))
         end
       end
       
@@ -39,7 +37,7 @@ describe UsersController do
       
       it "should have an element for each user" do
         get :index
-        @users[0..2].each do |user|
+        User.paginate(:page => 1).each do |user|
           response.should have_selector('li', :content => user.name)
         end
       end
@@ -402,3 +400,6 @@ describe UsersController do
     end
   end
 end
+
+
+
